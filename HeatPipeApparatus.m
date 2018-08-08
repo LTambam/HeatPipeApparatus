@@ -1,8 +1,10 @@
 function ArduinoINOUT
 
 %counter
-% global n
-% n = 1;
+global n
+n = 1;
+global n2
+n2 = 1;
 
 %Thermistor calibration constants
 global ka;
@@ -14,7 +16,9 @@ kc = 0.000000069697;
 
 %Timer iteration
 global t
-t = 0.10;
+t = 5;
+global t2
+t2 = 0.05;
 
 %Define constants for arduino hardware
 pin.T1 = 'A0';
@@ -34,9 +38,15 @@ a = arduino;
 
 % Set up timer for updating figure
 Timer = timer;
-Timer.TimerFcn = @(~,~) UpdateFigure(h,a);
+Timer.TimerFcn = @(~,~) UpdateFigure(h);
 Timer.ExecutionMode = 'fixedRate';
 Timer.Period = t;
+
+%Set up timer for acquiring data
+Timer2 = timer;
+Timer2.TimerFcn = @(~,~) AcquireData(h,a);
+Timer2.ExecutionMode = 'fixedRate';
+Timer2.Period = t2;
 
 % Store IVs
 %Time
@@ -79,109 +89,100 @@ setappdata(h.UIFigure,'pins',pin)
 setappdata(h.UIFigure,'oldValues',initial)
 
 % Handle closing the figure
-h.UIFigure.CloseRequestFcn = @(~,~) CloseFigure(h,Timer);
+h.UIFigure.CloseRequestFcn = @(~,~,~) CloseFigure(h,Timer,Timer2);
 
 % Start execution
 start(Timer)
+start(Timer2)
 
-function UpdateFigure(h,a)
-% global n
-global ka
-global kb
-global kc
-global t
+function UpdateFigure(h)
+global n
 if ~h.StopExperimentButton.Value
-    
+   
     %iterate the global variable n
-%     n = n+1;
+    n = n+1;
     
     %obtain data from the previous iteration
     old = getappdata(h.UIFigure,'oldValues');
-    pin = getappdata(h.UIFigure,'pins');
     
-%     %update gui plot
-%     plot(h.UIAxes,old.X(:,1),old.X(:,2),old.X(:,1),old.X(:,3),...
-%         old.X(:,1),old.X(:,4),old.X(:,1),old.X(:,5),old.X(:,1),...
-%         old.X(:,6),old.X(:,1),old.X(:,7),old.X(:,1),old.X(:,8),...
-%         old.X(:,1),old.X(:,9))
+    %update gui plot
+    plot(h.UIAxes,old.X(:,1),old.X(:,2),old.X(:,1),old.X(:,3),...
+        old.X(:,1),old.X(:,4),old.X(:,1),old.X(:,5),old.X(:,1),...
+        old.X(:,6),old.X(:,1),old.X(:,7),old.X(:,1),old.X(:,8),...
+        old.X(:,1),old.X(:,9))
     
     %resize axes
-%     if old.Time > 150
-%         h.UIAxes.XLim = [(old.Time-150) old.Time];
-%     end
+    if old.Time > 150
+        h.UIAxes.XLim = [(old.Time-150) old.Time];
+    end
     
     %set edit field values for gui
     h.TEF.Value = old.Time;
-%     h.T1EF.Value = old.T1;
-%     h.T2EF.Value = old.T2;
-%     h.T3EF.Value = old.T3;
-%     h.T4EF.Value = old.T4;
-%     h.T5EF.Value = old.T5;
-%     h.T6EF.Value = old.T6;
-%     h.T7EF.Value = old.T7;
-%     h.T8EF.Value = old.T8;
+    h.T1EF.Value = old.T1;
+    h.T2EF.Value = old.T2;
+    h.T3EF.Value = old.T3;
+    h.T4EF.Value = old.T4;
+    h.T5EF.Value = old.T5;
+    h.T6EF.Value = old.T6;
+    h.T7EF.Value = old.T7;
+    h.T8EF.Value = old.T8;
+    
+end
+drawnow
+
+function AcquireData(h)
+global n2
+global t2
+global ka
+global kb
+global kc
+if ~h.StopExperimentButton.Value
+    
+%     tic
+    
+    %iterate the global variable n
+    n2 = n2+1;
+    
+    %obtain data from the previous iteration
+    old = getappdata(h.UIFigure,'oldValues');
+    
+    pin = getappdata(h.UIFigure,'pins');
+    
 
     %set time
-    new.Time = old.Time+t;
+    new.Time = old.Time+t2;
     
     %Read Voltages from arduino
-    new.V1 = readVoltage(a,pin.T1);
-    new.V2 = readVoltage(a,pin.T2);
-    new.V3 = readVoltage(a,pin.T3);
-    new.V4 = readVoltage(a,pin.T4);
-    new.V5 = readVoltage(a,pin.T5);
-    new.V6 = readVoltage(a,pin.T6);
-    new.V7 = readVoltage(a,pin.T7);
-    new.V8 = readVoltage(a,pin.T8);
-    
-    %Update 
-%     new.T1 = (1/(ka+kb*(log((-100000*V1)/(V1-5)))+kc*((log((-100000*V1)/(V1-5))).^3)))-273.15;
-%     new.T2 = (1/(ka+kb*(log((-100000*V2)/(V2-5)))+kc*((log((-100000*V2)/(V2-5))).^3)))-273.15;
-%     new.T3 = (1/(ka+kb*(log((-100000*V3)/(V3-5)))+kc*((log((-100000*V3)/(V3-5))).^3)))-273.15;
-%     new.T4 = (1/(ka+kb*(log((-100000*V4)/(V4-5)))+kc*((log((-100000*V4)/(V4-5))).^3)))-273.15;
-%     new.T5 = (1/(ka+kb*(log((-100000*V5)/(V5-5)))+kc*((log((-100000*V5)/(V5-5))).^3)))-273.15;
-%     new.T6 = (1/(ka+kb*(log((-100000*V6)/(V6-5)))+kc*((log((-100000*V6)/(V6-5))).^3)))-273.15;
-%     new.T7 = (1/(ka+kb*(log((-100000*V7)/(V7-5)))+kc*((log((-100000*V7)/(V7-5))).^3)))-273.15;
-%     new.T8 = (1/(ka+kb*(log((-100000*V8)/(V8-5)))+kc*((log((-100000*V8)/(V8-5))).^3)))-273.15;
+    V1 = readVoltage(a,pin.T1);
+    V2 = readVoltage(a,pin.T2);
+    V3 = readVoltage(a,pin.T3);
+    V4 = readVoltage(a,pin.T4);
+    V5 = readVoltage(a,pin.T5);
+    V6 = readVoltage(a,pin.T6);
+    V7 = readVoltage(a,pin.T7);
+    V8 = readVoltage(a,pin.T8);
+
+    %Update
+    new.T1 = (1/(ka+kb*(log((-100000*V1)/(V1-5)))+kc*((log((-100000*V1)/(V1-5))).^3)))-273.15;
+    new.T2 = (1/(ka+kb*(log((-100000*V2)/(V2-5)))+kc*((log((-100000*V2)/(V2-5))).^3)))-273.15;
+    new.T3 = (1/(ka+kb*(log((-100000*V3)/(V3-5)))+kc*((log((-100000*V3)/(V3-5))).^3)))-273.15;
+    new.T4 = (1/(ka+kb*(log((-100000*V4)/(V4-5)))+kc*((log((-100000*V4)/(V4-5))).^3)))-273.15;
+    new.T5 = (1/(ka+kb*(log((-100000*V5)/(V5-5)))+kc*((log((-100000*V5)/(V5-5))).^3)))-273.15;
+    new.T6 = (1/(ka+kb*(log((-100000*V6)/(V6-5)))+kc*((log((-100000*V6)/(V6-5))).^3)))-273.15;
+    new.T7 = (1/(ka+kb*(log((-100000*V7)/(V7-5)))+kc*((log((-100000*V7)/(V7-5))).^3)))-273.15;
+    new.T8 = (1/(ka+kb*(log((-100000*V8)/(V8-5)))+kc*((log((-100000*V8)/(V8-5))).^3)))-273.15;
          
-    
-    
-    %create fresh array
-%     new.X = NaN(n,9);
-    new.X = [old.X; new.Time new.V1 new.V2 new.V3 new.V4 new.V5 new.V6 new.V7 new.V8];
-    
-    %update array
-%     for i = 1:(n-1)
-%         new.X(i,1) = old.X(i,1);
-%         new.X(i,2) = old.X(i,2);
-%         new.X(i,3) = old.X(i,3);
-%         new.X(i,4) = old.X(i,4);
-%         new.X(i,5) = old.X(i,5);
-%         new.X(i,6) = old.X(i,6);
-%         new.X(i,7) = old.X(i,7);
-%         new.X(i,8) = old.X(i,8);
-%         new.X(i,9) = old.X(i,9);
-%     end
-    
-    %Update next values
-%     new.X(n,1) = new.Time;
-%     new.X(n,2) = new.T1;
-%     new.X(n,3) = new.T2;
-%     new.X(n,4) = new.T3;
-%     new.X(n,5) = new.T4;
-%     new.X(n,6) = new.T5;
-%     new.X(n,7) = new.T6;
-%     new.X(n,8) = new.T7;
-%     new.X(n,9) = new.T8;
+    new.X = [old.X; new.Time new.T1 new.T2 new.T3 new.T4 new.T5 new.T6 new.T7 new.T8];
     
     %save values to app data
     setappdata(h.UIFigure,'oldValues',new)
     
+%     timeval = toc;
+%     disp(timeval)
+    
 end
 
-drawnow
-
-function CloseFigure(h,Timer)
+function CloseFigure(h,Timer,Timer2)
 
 var = getappdata(h.UIFigure,'oldValues');
 Y = var.X;
@@ -191,5 +192,10 @@ save('luke.mat','Y')
 %clearing objects
 stop(Timer)
 delete(Timer)
+stop(Timer2)
+delete(Timer2)
+
 delete(h.UIFigure)
-clear a
+
+clear obj
+
