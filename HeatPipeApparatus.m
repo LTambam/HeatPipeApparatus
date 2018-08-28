@@ -1,4 +1,4 @@
-function ArduinoINOUT
+function HeatPipeApparatus
 
 %counter
 global n
@@ -14,11 +14,11 @@ ka = 0.0006234;
 kb = 0.0002279;
 kc = 0.000000069697;
 
-%Timer iteration
+%Timer period
 global t
 t = 5;
 global t2
-t2 = 0.05;
+t2 = 1;
 
 %Define constants for arduino hardware
 pin.T1 = 'A0';
@@ -62,16 +62,6 @@ initial.T6 = 0;
 initial.T7 = 0;
 initial.T8 = 0;
 
-%Voltages
-initial.V1 = 0;
-initial.V2 = 0;
-initial.V3 = 0;
-initial.V4 = 0;
-initial.V5 = 0;
-initial.V6 = 0;
-initial.V7 = 0;
-initial.V8 = 0;
-
 %Array for values
 initial.X(1,1) = initial.Time;
 initial.X(1,2) = initial.T1;
@@ -97,7 +87,7 @@ start(Timer2)
 
 function UpdateFigure(h)
 global n
-if ~h.StopExperimentButton.Value
+if h.StartExperimentButton.Value
    
     %iterate the global variable n
     n = n+1;
@@ -127,18 +117,41 @@ if ~h.StopExperimentButton.Value
     h.T7EF.Value = old.T7;
     h.T8EF.Value = old.T8;
     
+else
+    if h.ResetExperimentButton.Value
+        n = 1;
+        
+        %obtain data from the previous iteration
+        old = getappdata(h.UIFigure,'oldValues');
+        
+        %update gui plot
+        plot(h.UIAxes,old.X(:,1),old.X(:,2),old.X(:,1),old.X(:,3),...
+            old.X(:,1),old.X(:,4),old.X(:,1),old.X(:,5),old.X(:,1),...
+            old.X(:,6),old.X(:,1),old.X(:,7),old.X(:,1),old.X(:,8),...
+            old.X(:,1),old.X(:,9))
+        
+        h.UIAxes.XLim = [0 150];
+        
+        h.TEF.Value = 0;
+        h.T1EF.Value = 0;
+        h.T2EF.Value = 0;
+        h.T3EF.Value = 0;
+        h.T4EF.Value = 0;
+        h.T5EF.Value = 0;
+        h.T6EF.Value = 0;
+        h.T7EF.Value = 0;
+        h.T8EF.Value = 0;
+    end
 end
 drawnow
 
-function AcquireData(h)
+function AcquireData(h,a)
 global n2
 global t2
 global ka
 global kb
 global kc
-if ~h.StopExperimentButton.Value
-    
-%     tic
+if h.StartExperimentButton.Value
     
     %iterate the global variable n
     n2 = n2+1;
@@ -161,8 +174,8 @@ if ~h.StopExperimentButton.Value
     V6 = readVoltage(a,pin.T6);
     V7 = readVoltage(a,pin.T7);
     V8 = readVoltage(a,pin.T8);
-
-    %Update
+    
+    %save temperature data 
     new.T1 = (1/(ka+kb*(log((-100000*V1)/(V1-5)))+kc*((log((-100000*V1)/(V1-5))).^3)))-273.15;
     new.T2 = (1/(ka+kb*(log((-100000*V2)/(V2-5)))+kc*((log((-100000*V2)/(V2-5))).^3)))-273.15;
     new.T3 = (1/(ka+kb*(log((-100000*V3)/(V3-5)))+kc*((log((-100000*V3)/(V3-5))).^3)))-273.15;
@@ -172,6 +185,15 @@ if ~h.StopExperimentButton.Value
     new.T7 = (1/(ka+kb*(log((-100000*V7)/(V7-5)))+kc*((log((-100000*V7)/(V7-5))).^3)))-273.15;
     new.T8 = (1/(ka+kb*(log((-100000*V8)/(V8-5)))+kc*((log((-100000*V8)/(V8-5))).^3)))-273.15;
          
+    new.T1 = 1;
+    new.T2 = 2;
+    new.T3 = 3;
+    new.T4 = 4;
+    new.T5 = 5;
+    new.T6 = 6;
+    new.T7 = 7;
+    new.T8 = 8;
+
     new.X = [old.X; new.Time new.T1 new.T2 new.T3 new.T4 new.T5 new.T6 new.T7 new.T8];
     
     %save values to app data
@@ -179,15 +201,65 @@ if ~h.StopExperimentButton.Value
     
 %     timeval = toc;
 %     disp(timeval)
-    
+
+else
+    if h.ResetExperimentButton.Value
+        
+        n2 = 1;
+               
+        new.Time = 0;
+        
+        new.T1 = 0;
+        new.T2 = 0;
+        new.T3 = 0;
+        new.T4 = 0;
+        new.T5 = 0;
+        new.T6 = 0;
+        new.T7 = 0;
+        new.T8 = 0;
+        
+        new.X = [new.Time new.T1 new.T2 new.T3 new.T4 new.T5 new.T6 new.T7 new.T8];
+        
+        %save values to app data
+        setappdata(h.UIFigure,'oldValues',new)
+    end
+    if h.SaveButton.Value
+        old = getappdata(h.UIFigure,'oldValues');
+        FRtxt = 'Flow Rate [mL/min]: ';
+        Ltxt = ', Length [mm]: ';
+        IDtxt = ', Inner Diameter [mm]: ';
+        ODtxt = ', OuterDiameter [mm]: ';
+        
+        FR = h.FREF.Value;
+        L = h.LEF.Value;
+        ID = h.IDEF.Value;
+        OD = h.ODEF.Value;
+        
+        textFile = strcat(FRtxt,FR,Ltxt,L,IDtxt,ID,ODtxt,OD);
+        
+        fileName = h.FNEF.Value;
+        txt = '.txt';
+        mat = '.mat';
+        fntxt = strcat(fileName,txt);
+        fnmat = strcat(fileName,mat);
+        
+        Y = old.X;
+                
+        disp(textFile)
+        disp(Y)
+        dlmwrite(fntxt,textFile,'delimiter','')
+        save(fnmat,'Y')
+        
+        h.SaveButton.Value = false;
+    end
 end
 
 function CloseFigure(h,Timer,Timer2)
 
-var = getappdata(h.UIFigure,'oldValues');
-Y = var.X;
-disp(Y)
-save('luke.mat','Y')
+% var = getappdata(h.UIFigure,'oldValues');
+% Y = var.X;
+% disp(Y)
+% save('luke.mat','Y')
 
 %clearing objects
 stop(Timer)
