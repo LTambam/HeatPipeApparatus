@@ -3,6 +3,7 @@ function HeatPipeApparatus
 %counter for timer1
 global n
 n = 1;
+
 %counter for timer2
 global n2
 n2 = 1;
@@ -102,6 +103,7 @@ if h.StartExperimentButton.Value
     
     %obtain data from the previous iteration
     old = getappdata(h.UIFigure,'oldValues');
+    
     
     %update plot
     plot(h.UIAxes,old.X(:,1),old.X(:,2),old.X(:,1),old.X(:,3),...
@@ -280,31 +282,35 @@ else
         
         %make Y variable of data array
         Y = old.X;
-               
-        
+        %Take off the first row of data, the zero row
+        Y = Y(2:end,:);
+           
+        %diplay data on terminal
         disp(textFile)
         disp(Y)
+        
+        %save the string to filename.txt
         dlmwrite(fntxt,textFile,'delimiter','')
+        
+        %save matrix to filename.mat
         save(fnmat,'Y')
         
+        %unpress the save button
         h.SaveButton.Value = false;
     end
 end
 
 function CloseFigure(h,Timer,Timer2)
 
-% var = getappdata(h.UIFigure,'oldValues');
-% Y = var.X;
-% disp(Y)
-% save('luke.mat','Y')
-
-%clearing objects
+%stop and delete timer objects
 stop(Timer)
 delete(Timer)
 stop(Timer2)
 delete(Timer2)
 
+%delete gui object
 delete(h.UIFigure)
 
+%clear objects
 clear obj
 
