@@ -128,9 +128,15 @@ if h.StartExperimentButton.Value
     h.T8EF.Value = old.T8;
     
     %calculate values for heat in and heat out
-    %Specific Heat C = 4.8186 j/gC
-    %mass flow rate g/s = mL/min/60 
-    %m = (str2num(h.FREF.Value)/6000);
+    %Specific Heat C = 4.8184 j/gC
+    %mass flow rate m = g/s = mL/min/60   
+    
+    %Heat out calculation -- Q = m*C*deltaT
+    h.HeatOutEF.Value = ((str2double(h.FREF.Value))/60)*4.8184*(old.T8-old.T7);
+    
+    %Heat in calculation -- P = I*V
+    h.HeatInEF.Value = (str2double(h.VEF.Value))*(str2double(h.IEF.Value));
+    
     
 %when the start button isn't pressed
 else
@@ -255,19 +261,20 @@ else
         old = getappdata(h.UIFigure,'oldValues');
         
         %char strings for text file
-        FRtxt = 'Flow Rate [mL/min]: ';
+        FRtxt = ' --- Flow Rate [mL/min]: ';
         Ltxt = ' Length [mm]: ';
         IDtxt = ' Inner Diameter [mm]: ';
         ODtxt = ' OuterDiameter [mm]: ';
         
         %obtain edit field inputs from gui object
+        EI = h.EIEF.Value;
         FR = h.FREF.Value;
         L = h.LEF.Value;
         ID = h.IDEF.Value;
         OD = h.ODEF.Value;
         
         %join char strings together with edit field values
-        textFile = strcat(FRtxt,FR,Ltxt,L,IDtxt,ID,ODtxt,OD);
+        textFile = strcat(EI,FRtxt,FR,Ltxt,L,IDtxt,ID,ODtxt,OD);
         
         %obtain input file name
         fileName = h.FNEF.Value;

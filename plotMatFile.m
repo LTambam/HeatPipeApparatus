@@ -1,7 +1,7 @@
 function plotMatFile
 
 %insert file name you would like to plot here
-filename = 'luke.mat';
+filename = 'Exp8_ethanol.mat';
 
 %load data from filename onto Data
 Data = load(filename);

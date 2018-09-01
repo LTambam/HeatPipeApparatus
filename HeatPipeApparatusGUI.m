@@ -52,6 +52,8 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
         SaveButton                    matlab.ui.control.StateButton
         FNEF                          matlab.ui.control.EditField
         FNLabel                       matlab.ui.control.Label
+        EILabel                       matlab.ui.control.Label
+        EIEF                          matlab.ui.control.EditField
     end
 
     % App initialization and construction
@@ -113,12 +115,12 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             % Create T7Label
             app.T7Label = uilabel(app.MainTab);
             app.T7Label.Position = [70 190 25 15];
-            app.T7Label.Text = 'T7 (Inlet):';
+            app.T7Label.Text = 'T7:';
 
             % Create T8Label
             app.T8Label = uilabel(app.MainTab);
             app.T8Label.Position = [70 160 25 15];
-            app.T8Label.Text = 'T8 (Outlet):';
+            app.T8Label.Text = 'T8:';
                    
             % Create EditField_T1
             app.T1EF = uieditfield(app.MainTab, 'numeric');
@@ -182,31 +184,32 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             % Create WaterJacketLabel
             app.WaterJacketLabel = uilabel(app.MainTab);
             app.WaterJacketLabel.FontWeight = 'bold';
-            app.WaterJacketLabel.Position = [230 400 81 15];
+            app.WaterJacketLabel.Position = [430 400 81 15];
             app.WaterJacketLabel.Text = 'Water Jacket';
             
             % Create FlowRateLmLabel
             app.FlowRateLmLabel = uilabel(app.MainTab);
-            app.FlowRateLmLabel.Position = [230 370 94 15];
-            app.FlowRateLmLabel.Text = 'Flow Rate (mL/min):';
+            app.FlowRateLmLabel.Position = [430 370 94 15];
+            app.FlowRateLmLabel.Text = 'Flow Rate(mL/min):';
             
             % Create EditField FR
             app.FREF = uieditfield(app.MainTab, 'text');
 %             app.FREF.Limits = [0 1000];
 %             app.FREF.ValueDisplayFormat = '%.0f';
-            app.FREF.Position = [330 366 38 22];
+            app.FREF.Position = [530 366 38 22];
+            app.FREF.Value = '0';
                         
             % Create HeatOutWLabel
             app.HeatOutWLabel = uilabel(app.MainTab);
-            app.HeatOutWLabel.Position = [230 340 81 15];
+            app.HeatOutWLabel.Position = [430 340 81 15];
             app.HeatOutWLabel.Text = 'Heat Out (W): ';
                                     
             % Create HeatOutEF
             app.HeatOutEF = uieditfield(app.MainTab, 'numeric');
-            app.HeatOutEF.Limits = [0 2000];
+            app.HeatOutEF.Limits = [-2000 2000];
             app.HeatOutEF.ValueDisplayFormat = '%.1f';
             app.HeatOutEF.Editable = 'off';
-            app.HeatOutEF.Position = [330 336 38 22];
+            app.HeatOutEF.Position = [530 336 38 22];
             
             %%%%%%%%%%%%%%%%%            
             
@@ -214,79 +217,79 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             % Create HeaterLabel
             app.HeaterLabel = uilabel(app.MainTab);
             app.HeaterLabel.FontWeight = 'bold';
-            app.HeaterLabel.Position = [230 250 62 15];
+            app.HeaterLabel.Position = [230 280 62 15];
             app.HeaterLabel.Text = 'Heater';
             
             % Create VoltageVLabel
             app.VoltageVLabel = uilabel(app.MainTab);
-            app.VoltageVLabel.Position = [230 220 72 15];
+            app.VoltageVLabel.Position = [230 250 72 15];
             app.VoltageVLabel.Text = 'Voltage (V): ';
             
             % Create VEF
             app.VEF = uieditfield(app.MainTab, 'text');
-%             app.VEF.Limits = [0 100];
-%             app.VEF.ValueDisplayFormat = '%.1f';
-            app.VEF.Position = [330 216 38 22];
+            app.VEF.Position = [330 246 38 22];
+            app.VEF.Value = '0';
 
             % Create CurrentALabel
             app.CurrentALabel = uilabel(app.MainTab);
-            app.CurrentALabel.Position = [230 190 68 15];
+            app.CurrentALabel.Position = [230 220 68 15];
             app.CurrentALabel.Text = 'Current (A):';
             
             % Create IEF
             app.IEF = uieditfield(app.MainTab, 'text');
-%             app.IEF.Limits = [0 100];
-%             app.IEF.ValueDisplayFormat = '%.1f';
-            app.IEF.Position = [330 186 38 22];
+            app.IEF.Position = [330 216 38 22];
+            app.IEF.Value = '0';
             
             % Create HeatInWLabel
             app.HeatInWLabel = uilabel(app.MainTab);
-            app.HeatInWLabel.Position = [230 160 72 15];
+            app.HeatInWLabel.Position = [230 190 72 15];
             app.HeatInWLabel.Text = 'Heat In (W): ';
             
             % Create HeatInEF
             app.HeatInEF = uieditfield(app.MainTab, 'numeric');
             app.HeatInEF.Limits = [0 200];
-            app.HeatInEF.ValueDisplayFormat = '%.2f';
+            app.HeatInEF.ValueDisplayFormat = '%.1f';
             app.HeatInEF.Editable = 'off';
-            app.HeatInEF.Position = [330 156 38 22];
-
-                        
+            app.HeatInEF.Position = [330 186 38 22];
+    
             %%%%%%%%%%%%%%%%%%
             
             %Start of Geometry UI
             % Create GeometryLabel
             app.GeometryLabel = uilabel(app.MainTab);
             app.GeometryLabel.FontWeight = 'bold';
-            app.GeometryLabel.Position = [430 400 62 15];
+            app.GeometryLabel.Position = [230 400 62 15];
             app.GeometryLabel.Text = 'Geometry';
 
             % Create LengthmmLabel
             app.LengthmmLabel = uilabel(app.MainTab);
-            app.LengthmmLabel.Position = [430 370 77 15];
+            app.LengthmmLabel.Position = [230 370 77 15];
             app.LengthmmLabel.Text = 'L [mm]:';
             
             % Create LEF
             app.LEF = uieditfield(app.MainTab, 'text');
-            app.LEF.Position = [530 366 38 22];
+            app.LEF.Position = [330 366 38 22];
+            app.LEF.Value = '0';
 
             % Create Outer Diameter Label
             app.ODLabel = uilabel(app.MainTab);
-            app.ODLabel.Position = [430 340 89 15];
+            app.ODLabel.Position = [230 340 89 15];
             app.ODLabel.Text = 'OD [mm]:';
            
             % Create ODEF
             app.ODEF = uieditfield(app.MainTab, 'text');
-            app.ODEF.Position = [530 336 38 22];             
+            app.ODEF.Position = [330 336 38 22];    
+            app.ODEF.Value = '0';
             
             % Create Inner Diameter Label
             app.IDLabel = uilabel(app.MainTab);
-            app.IDLabel.Position = [430 310 89 15];
+            app.IDLabel.Position = [230 310 89 15];
             app.IDLabel.Text = 'ID [mm]:';   
             
             % Create IDEF
             app.IDEF = uieditfield(app.MainTab, 'text');          
-            app.IDEF.Position = [530 306 38 22]; 
+            app.IDEF.Position = [330 306 38 22]; 
+            app.IDEF.Value = '0';
            
             %%%%%%%%%%%%%%%%%%%%
 
@@ -294,7 +297,7 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             % Create TimesLabel
             app.TimesLabel = uilabel(app.MainTab);
             app.TimesLabel.FontWeight = 'bold';
-            app.TimesLabel.Position = [430 40 58 15];
+            app.TimesLabel.Position = [430 157 58 15];
             app.TimesLabel.Text = 'Time (s): ';
 
             % Create TEF
@@ -302,14 +305,14 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             app.TEF.Limits = [0 10000];
             app.TEF.ValueDisplayFormat = '%.2f';
             app.TEF.Editable = 'off';
-            app.TEF.Position = [500 36 38 22];
+            app.TEF.Position = [500 153 38 22];
             %%%%%%%%%%%%%%%%%%%%%%%%
 
             %Start of Control Button UI
             % Create ExperimentControlButtonGroup
             app.ExperimentControlButtonGroup = uibuttongroup(app.MainTab);
             app.ExperimentControlButtonGroup.Title = 'Experiment Control';
-            app.ExperimentControlButtonGroup.Position = [430 70 123 115];
+            app.ExperimentControlButtonGroup.Position = [430 187 123 115];
 
             % Create StartExperimentButton
             app.StartExperimentButton = uitogglebutton(app.ExperimentControlButtonGroup);
@@ -324,12 +327,38 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             app.StopExperimentButton.Position = [8.5 40 105 22];
             app.StopExperimentButton.Value = true;
             
+            % Create ResetExperimentButton
             app.ResetExperimentButton = uitogglebutton(app.ExperimentControlButtonGroup);
             app.ResetExperimentButton.Text = 'Reset';
             app.ResetExperimentButton.BackgroundColor = [1 1 1];
             app.ResetExperimentButton.Position = [8.5 8 105 22];
                         
             %%%%%%%%%%%%%%%%%%%%%%%%
+            
+            % Create FilenameLabel
+            app.FNLabel = uilabel(app.MainTab);
+            app.FNLabel.Position = [70 60 77 15];
+            app.FNLabel.Text = 'Filename:';
+            
+            %edit field for writing file name
+            app.FNEF = uieditfield(app.MainTab, 'text');
+            app.FNEF.Position = [130 56 150 22];
+            
+            %button for saving data
+            app.SaveButton = uibutton(app.MainTab,'state');
+            app.SaveButton.Text = 'Save Data';
+            app.SaveButton.Position = [293 56 85 22];
+            
+            %label for experiement information
+            app.EILabel = uilabel(app.MainTab);
+            app.EILabel.Text = 'Experiment Information: ';
+            app.EILabel.Position = [70 100 150 15];
+            
+            %edit field for experiment information
+            app.EIEF = uieditfield(app.MainTab, 'text');
+            app.EIEF.Position = [220 96 350 22];
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             %Start of Live Plot UI
             % Create LiveTemperaturePlotTab
@@ -347,22 +376,9 @@ classdef HeatPipeApparatusGUI < matlab.apps.AppBase
             app.UIAxes.XLim = [0 150];
             app.UIAxes.YLim = [0 120];
             app.UIAxes.Position = [1 0 639 456];
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%
-            
-            % Create FilenameLabel
-            app.FNLabel = uilabel(app.MainTab);
-            app.FNLabel.Position = [70 90 77 15];
-            app.FNLabel.Text = 'Filename:';
-            
-            %edit field for writing file name
-            app.FNEF = uieditfield(app.MainTab, 'text');
-            app.FNEF.Position = [130 86 85 22];
-            
-            %button for saving data
-            app.SaveButton = uibutton(app.MainTab,'state');
-            app.SaveButton.Text = 'Save Data';
-            app.SaveButton.Position = [230 86 85 22];
-            
+                       
         end
     end
     
